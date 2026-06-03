@@ -1,0 +1,863 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>流注开穴</title>
+  <meta name="description" content="按时辰推算灵龟八法、飞腾八法、子午流注纳子法与纳甲法。支持真太阳时修正。">
+  <style>
+    :root {
+      --bg: #efe7d8;
+      --paper: rgba(255, 252, 246, 0.95);
+      --ink: #23190f;
+      --muted: #7a6452;
+      --line: #d9ccb6;
+      --gold: #8a6224;
+      --green: #2f6b5c;
+      --blue: #465d87;
+      --red: #7c3d43;
+      --shadow: 0 18px 40px rgba(56, 35, 12, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(201, 168, 76, 0.2), transparent 32%),
+        radial-gradient(circle at bottom right, rgba(122, 61, 67, 0.14), transparent 28%),
+        linear-gradient(180deg, #f6f0e5 0%, var(--bg) 100%);
+      font-family: "STKaiti", "KaiTi", "Noto Serif SC", serif;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    .shell {
+      width: min(100%, 560px);
+      margin: 0 auto;
+      padding: 24px 14px 72px;
+    }
+
+    .hero {
+      position: relative;
+      text-align: center;
+      padding: 16px 0 8px;
+    }
+
+    .hero-mark {
+      position: absolute;
+      inset: -6px 0 auto;
+      font-size: 82px;
+      color: rgba(201, 168, 76, 0.11);
+      letter-spacing: 8px;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .hero h1 {
+      position: relative;
+      margin: 0;
+      font-size: 30px;
+      letter-spacing: 6px;
+      font-weight: 700;
+    }
+
+    .hero p {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      letter-spacing: 2px;
+    }
+
+    .card {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(8px);
+    }
+
+    .panel {
+      padding: 16px;
+    }
+
+    .field {
+      display: grid;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .field label,
+    .inline-label {
+      font-size: 13px;
+      color: var(--muted);
+      letter-spacing: 1px;
+    }
+
+    .input,
+    .number-input {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #f7f1e6;
+      padding: 12px 14px;
+      font-size: 16px;
+      color: var(--ink);
+      outline: none;
+    }
+
+    .input:focus,
+    .number-input:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(138, 98, 36, 0.12);
+    }
+
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .toggle-row input {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--gold);
+    }
+
+    .solar-box {
+      display: none;
+      margin-top: 12px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(247, 241, 230, 0.88);
+    }
+
+    .solar-box.active {
+      display: grid;
+      gap: 10px;
+    }
+
+    .longitude-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .number-input {
+      width: 110px;
+      text-align: center;
+    }
+
+    .hint {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr 1.4fr;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .btn {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      height: 48px;
+      cursor: pointer;
+      background: transparent;
+      color: var(--muted);
+      letter-spacing: 1px;
+    }
+
+    .btn:disabled {
+      cursor: wait;
+      opacity: 0.6;
+    }
+
+    .btn-primary {
+      border: 0;
+      background: linear-gradient(135deg, #7f5a23, #9c7330);
+      color: #fffdf6;
+      box-shadow: 0 10px 24px rgba(124, 92, 46, 0.28);
+      letter-spacing: 3px;
+    }
+
+    .banner {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 14px 0 4px;
+      flex-wrap: wrap;
+    }
+
+    .banner.active,
+    .results.active {
+      display: flex;
+    }
+
+    .pill {
+      text-align: center;
+      min-width: 88px;
+    }
+
+    .pill small {
+      display: block;
+      color: var(--muted);
+      font-size: 10px;
+      letter-spacing: 2px;
+      margin-bottom: 3px;
+    }
+
+    .pill strong {
+      font-size: 22px;
+      letter-spacing: 4px;
+      font-weight: 700;
+    }
+
+    .sep {
+      color: #bea98f;
+      font-size: 18px;
+      padding-bottom: 4px;
+    }
+
+    .solar-result {
+      display: none;
+      margin-top: 12px;
+      padding: 14px 16px;
+      border-radius: 16px;
+      background: #ebf5f1;
+      border: 1px solid #bbd8ce;
+    }
+
+    .solar-result.active {
+      display: block;
+    }
+
+    .solar-result h2 {
+      margin: 0 0 8px;
+      font-size: 12px;
+      color: var(--green);
+      letter-spacing: 2px;
+    }
+
+    .solar-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 10px;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.8;
+    }
+
+    .solar-time {
+      margin-top: 8px;
+      font-size: 24px;
+      color: var(--green);
+      letter-spacing: 4px;
+      font-weight: 700;
+    }
+
+    .results {
+      display: none;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .method {
+      padding: 14px;
+      border-left: 4px solid currentColor;
+      animation: rise .28s ease;
+    }
+
+    .method-head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+
+    .method-title {
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 2px;
+    }
+
+    .badge {
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 10px;
+      letter-spacing: 1px;
+      background: rgba(0, 0, 0, 0.06);
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: stretch;
+    }
+
+    .plus {
+      align-self: center;
+      color: #b8a38a;
+      font-size: 18px;
+      font-weight: 300;
+    }
+
+    .chip {
+      flex: 1 1 96px;
+      min-width: 96px;
+      padding: 10px 8px;
+      border-radius: 12px;
+      background: #f6f0e4;
+      text-align: center;
+    }
+
+    .chip-label {
+      color: var(--muted);
+      font-size: 10px;
+      letter-spacing: 2px;
+      margin-bottom: 4px;
+    }
+
+    .chip-name {
+      font-size: 20px;
+      letter-spacing: 2px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .chip-meta {
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.5;
+    }
+
+    .empty {
+      color: var(--muted);
+      font-size: 13px;
+      letter-spacing: 1px;
+    }
+
+    .foot {
+      text-align: center;
+      color: #bca68d;
+      font-size: 10px;
+      letter-spacing: 3px;
+      margin-top: 8px;
+    }
+
+    @keyframes rise {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 560px) {
+      .hero h1 {
+        font-size: 28px;
+      }
+
+      .actions {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="hero">
+      <div class="hero-mark">龜</div>
+      <h1>流注开穴</h1>
+      <p>子午流注 · 灵龟八法 · 飞腾八法</p>
+    </header>
+
+    <section class="card panel">
+      <div class="field">
+        <label for="dt">日期时间</label>
+        <input id="dt" class="input" type="datetime-local">
+      </div>
+
+      <div class="toggle-row">
+        <input id="use-solar" type="checkbox">
+        <label class="inline-label" for="use-solar">启用真太阳时修正</label>
+      </div>
+
+      <div id="solar-box" class="solar-box">
+        <div class="longitude-row">
+          <span class="inline-label">当地经度</span>
+          <input id="longitude" class="number-input" type="number" min="70" max="135" step="0.1" value="116.4">
+          <span class="inline-label">° E</span>
+          <button id="locate" class="btn" type="button">自动定位</button>
+        </div>
+        <div id="location-hint" class="hint">默认使用北京东经 116.4°。</div>
+      </div>
+
+      <div class="actions">
+        <button id="now" class="btn" type="button">当前时间</button>
+        <button id="calc" class="btn btn-primary" type="button">推算开穴</button>
+      </div>
+    </section>
+
+    <section id="solar-result" class="solar-result">
+      <h2>真太阳时修正</h2>
+      <div id="solar-meta" class="solar-meta"></div>
+      <div id="solar-time" class="solar-time"></div>
+    </section>
+
+    <section id="banner" class="banner">
+      <div class="pill">
+        <small>日干支</small>
+        <strong id="day-sb"></strong>
+      </div>
+      <div class="sep">·</div>
+      <div class="pill">
+        <small>时干支</small>
+        <strong id="hour-sb"></strong>
+      </div>
+      <div class="sep">·</div>
+      <div class="pill">
+        <small>时辰</small>
+        <strong id="branch-label"></strong>
+      </div>
+    </section>
+
+    <section id="results" class="results">
+      <article class="card method" style="color: var(--gold);">
+        <div class="method-head">
+          <span class="method-title">灵龟八法</span>
+          <span class="badge">奇经纳卦</span>
+        </div>
+        <div id="linggui" class="chips"></div>
+      </article>
+
+      <article class="card method" style="color: var(--green);">
+        <div class="method-head">
+          <span class="method-title">飞腾八法</span>
+        </div>
+        <div id="feiteng" class="chips"></div>
+      </article>
+
+      <article class="card method" style="color: var(--blue);">
+        <div class="method-head">
+          <span class="method-title">子午流注纳子法</span>
+          <span id="nazi-badge" class="badge"></span>
+        </div>
+        <div id="nazi" class="chips"></div>
+      </article>
+
+      <article class="card method" style="color: var(--red);">
+        <div class="method-head">
+          <span class="method-title">子午流注纳甲法</span>
+          <span id="najia-badge" class="badge"></span>
+        </div>
+        <div id="najia" class="chips"></div>
+      </article>
+    </section>
+
+    <div class="foot">按时取穴 · 因时制宜</div>
+  </main>
+
+  <script>
+    const STEMS = ["甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸"];
+    const BRANCHES = ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"];
+
+    const HOUR_BASE = { 甲: 0, 己: 0, 乙: 2, 庚: 2, 丙: 4, 辛: 4, 丁: 6, 壬: 6, 戊: 8, 癸: 8 };
+
+    const LG_DS = { 甲: 10, 己: 10, 乙: 9, 庚: 9, 丁: 8, 壬: 8, 戊: 7, 癸: 7, 丙: 7, 辛: 7 };
+    const LG_DB = { 辰: 10, 戌: 10, 丑: 10, 未: 10, 申: 9, 酉: 9, 寅: 8, 卯: 8, 巳: 7, 午: 7, 亥: 7, 子: 7 };
+    const LG_HS = { 甲: 9, 己: 9, 乙: 8, 庚: 8, 丙: 7, 辛: 7, 丁: 6, 壬: 6, 戊: 5, 癸: 5 };
+    const LG_HB = { 子: 9, 午: 9, 丑: 8, 未: 8, 寅: 7, 申: 7, 卯: 6, 酉: 6, 辰: 5, 戌: 5, 巳: 4, 亥: 4 };
+
+    const LG_MAP = { 1: "申脉", 2: "照海", 3: "外关", 4: "足临泣", 5: "照海", 6: "公孙", 7: "后溪", 8: "内关", 9: "列缺" };
+    const PAIR = {
+      申脉: "后溪",
+      后溪: "申脉",
+      照海: "列缺",
+      列缺: "照海",
+      外关: "足临泣",
+      足临泣: "外关",
+      内关: "公孙",
+      公孙: "内关"
+    };
+
+    const POINT_META = {
+      申脉: { m: "膀胱经", e: "阳跷脉" },
+      照海: { m: "肾经", e: "阴跷脉" },
+      外关: { m: "三焦经", e: "阳维脉" },
+      足临泣: { m: "胆经", e: "带脉" },
+      公孙: { m: "脾经", e: "冲脉" },
+      后溪: { m: "小肠经", e: "督脉" },
+      内关: { m: "心包经", e: "阴维脉" },
+      列缺: { m: "肺经", e: "任脉" }
+    };
+
+    const FT_MAP = {
+      甲: "公孙",
+      壬: "公孙",
+      丙: "内关",
+      戊: "足临泣",
+      庚: "外关",
+      辛: "后溪",
+      乙: "申脉",
+      癸: "申脉",
+      己: "列缺",
+      丁: "照海"
+    };
+
+    const NAZI_TABLE = {
+      子: ["胆经", "足临泣", "GB41", "丘墟", "GB40"],
+      丑: ["肝经", "大敦", "LR1", "太冲", "LR3"],
+      寅: ["肺经", "太渊", "LU9", "太渊", "LU9"],
+      卯: ["大肠经", "阳溪", "LI5", "合谷", "LI4"],
+      辰: ["胃经", "足三里", "ST36", "冲阳", "ST42"],
+      巳: ["脾经", "太白", "SP3", "太白", "SP3"],
+      午: ["心经", "少府", "HT8", "神门", "HT7"],
+      未: ["小肠经", "阳谷", "SI5", "腕骨", "SI4"],
+      申: ["膀胱经", "昆仑", "BL60", "京骨", "BL64"],
+      酉: ["肾经", "然谷", "KI2", "太溪", "KI3"],
+      戌: ["心包经", "劳宫", "PC8", "大陵", "PC7"],
+      亥: ["三焦经", "支沟", "TE6", "阳池", "TE4"]
+    };
+
+    const NAJIA_TABLE = {
+      甲: {
+        甲戌: [{ name: "窍阴", code: "GB44", type: "井", m: "胆经" }],
+        丙子: [{ name: "前谷", code: "SI2", type: "荥", m: "小肠经" }],
+        戊寅: [{ name: "陷谷", code: "ST43", type: "输", m: "胃经" }, { name: "丘墟", code: "GB40", type: "原", m: "胆经" }],
+        庚辰: [{ name: "阳溪", code: "LI5", type: "经", m: "大肠经" }],
+        壬午: [{ name: "委中", code: "BL40", type: "合", m: "膀胱经" }],
+        甲申: [{ name: "液门", code: "TE2", type: "荥", m: "三焦经" }]
+      },
+      乙: {
+        乙酉: [{ name: "大敦", code: "LR1", type: "井", m: "肝经" }],
+        丁亥: [{ name: "少府", code: "HT8", type: "荥", m: "心经" }],
+        己丑: [{ name: "太白", code: "SP3", type: "输", m: "脾经" }, { name: "太冲", code: "LR3", type: "原", m: "肝经" }],
+        辛卯: [{ name: "经渠", code: "LU8", type: "经", m: "肺经" }],
+        癸巳: [{ name: "阴谷", code: "KI10", type: "合", m: "肾经" }],
+        乙未: [{ name: "劳宫", code: "PC8", type: "荥", m: "心包经" }]
+      },
+      丙: {
+        丙申: [{ name: "少泽", code: "SI1", type: "井", m: "小肠经" }],
+        戊戌: [{ name: "内庭", code: "ST44", type: "荥", m: "胃经" }],
+        庚子: [{ name: "三间", code: "LI3", type: "输", m: "大肠经" }, { name: "腕骨", code: "SI4", type: "原", m: "小肠经" }],
+        壬寅: [{ name: "昆仑", code: "BL60", type: "经", m: "膀胱经" }],
+        甲辰: [{ name: "阳陵泉", code: "GB34", type: "合", m: "胆经" }],
+        丙午: [{ name: "中渚", code: "TE3", type: "输", m: "三焦经" }]
+      },
+      丁: {
+        丁未: [{ name: "少冲", code: "HT9", type: "井", m: "心经" }],
+        己酉: [{ name: "大都", code: "SP2", type: "荥", m: "脾经" }],
+        辛亥: [{ name: "太渊", code: "LU9", type: "输", m: "肺经" }, { name: "神门", code: "HT7", type: "原", m: "心经" }],
+        癸丑: [{ name: "复溜", code: "KI7", type: "经", m: "肾经" }],
+        乙卯: [{ name: "曲泉", code: "LR8", type: "合", m: "肝经" }],
+        丁巳: [{ name: "大陵", code: "PC7", type: "输", m: "心包经" }]
+      },
+      戊: {
+        戊午: [{ name: "厉兑", code: "ST45", type: "井", m: "胃经" }],
+        庚申: [{ name: "二间", code: "LI2", type: "荥", m: "大肠经" }],
+        壬戌: [{ name: "束骨", code: "BL65", type: "输", m: "膀胱经" }, { name: "冲阳", code: "ST42", type: "原", m: "胃经" }],
+        甲子: [{ name: "阳辅", code: "GB38", type: "经", m: "胆经" }],
+        丙寅: [{ name: "小海", code: "SI8", type: "合", m: "小肠经" }],
+        戊辰: [{ name: "支沟", code: "TE6", type: "经", m: "三焦经" }]
+      },
+      己: {
+        己巳: [{ name: "隐白", code: "SP1", type: "井", m: "脾经" }],
+        辛未: [{ name: "鱼际", code: "LU10", type: "荥", m: "肺经" }],
+        癸酉: [{ name: "太溪", code: "KI3", type: "输", m: "肾经" }, { name: "太白", code: "SP3", type: "原", m: "脾经" }],
+        乙亥: [{ name: "中封", code: "LR4", type: "经", m: "肝经" }],
+        丁丑: [{ name: "少海", code: "HT3", type: "合", m: "心经" }],
+        己卯: [{ name: "间使", code: "PC5", type: "经", m: "心包经" }]
+      },
+      庚: {
+        庚辰: [{ name: "商阳", code: "LI1", type: "井", m: "大肠经" }],
+        壬午: [{ name: "通谷", code: "BL66", type: "荥", m: "膀胱经" }],
+        甲申: [{ name: "足临泣", code: "GB41", type: "输", m: "胆经" }, { name: "合谷", code: "LI4", type: "原", m: "大肠经" }],
+        丙戌: [{ name: "阳谷", code: "SI5", type: "经", m: "小肠经" }],
+        戊子: [{ name: "足三里", code: "ST36", type: "合", m: "胃经" }],
+        庚寅: [{ name: "天井", code: "TE10", type: "合", m: "三焦经" }]
+      },
+      辛: {
+        辛卯: [{ name: "少商", code: "LU11", type: "井", m: "肺经" }],
+        癸巳: [{ name: "然谷", code: "KI2", type: "荥", m: "肾经" }],
+        乙未: [{ name: "太冲", code: "LR3", type: "输", m: "肝经" }, { name: "太渊", code: "LU9", type: "原", m: "肺经" }],
+        丁酉: [{ name: "灵道", code: "HT4", type: "经", m: "心经" }],
+        己亥: [{ name: "阴陵泉", code: "SP9", type: "合", m: "脾经" }],
+        辛丑: [{ name: "曲泽", code: "PC3", type: "合", m: "心包经" }]
+      },
+      壬: {
+        壬寅: [{ name: "至阴", code: "BL67", type: "井", m: "膀胱经" }],
+        甲辰: [{ name: "侠溪", code: "GB43", type: "荥", m: "胆经" }],
+        丙午: [
+          { name: "后溪", code: "SI3", type: "输", m: "小肠经" },
+          { name: "京骨", code: "BL64", type: "原", m: "膀胱经" },
+          { name: "阳池", code: "TE4", type: "原", m: "三焦经" }
+        ],
+        戊申: [{ name: "解溪", code: "ST41", type: "经", m: "胃经" }],
+        庚戌: [{ name: "曲池", code: "LI11", type: "合", m: "大肠经" }],
+        壬子: [{ name: "关冲", code: "TE1", type: "井", m: "三焦经" }]
+      },
+      癸: {
+        癸亥: [{ name: "涌泉", code: "KI1", type: "井", m: "肾经" }],
+        乙丑: [{ name: "行间", code: "LR2", type: "荥", m: "肝经" }],
+        丁卯: [
+          { name: "神门", code: "HT7", type: "输", m: "心经" },
+          { name: "太溪", code: "KI3", type: "原", m: "肾经" },
+          { name: "大陵", code: "PC7", type: "原", m: "心包经" }
+        ],
+        己巳: [{ name: "商丘", code: "SP5", type: "经", m: "脾经" }],
+        辛未: [{ name: "尺泽", code: "LU5", type: "合", m: "肺经" }],
+        癸酉: [{ name: "中冲", code: "PC9", type: "井", m: "心包经" }]
+      }
+    };
+
+    const dtInput = document.getElementById("dt");
+    const useSolarInput = document.getElementById("use-solar");
+    const solarBox = document.getElementById("solar-box");
+    const longitudeInput = document.getElementById("longitude");
+    const locateButton = document.getElementById("locate");
+    const locationHint = document.getElementById("location-hint");
+    const nowButton = document.getElementById("now");
+    const calcButton = document.getElementById("calc");
+
+    const solarResult = document.getElementById("solar-result");
+    const solarMeta = document.getElementById("solar-meta");
+    const solarTime = document.getElementById("solar-time");
+    const banner = document.getElementById("banner");
+    const results = document.getElementById("results");
+
+    function pad(num) {
+      return String(num).padStart(2, "0");
+    }
+
+    function toLocalDT(date) {
+      return [
+        date.getFullYear(),
+        pad(date.getMonth() + 1),
+        pad(date.getDate())
+      ].join("-") + "T" + [pad(date.getHours()), pad(date.getMinutes())].join(":");
+    }
+
+    function equationOfTime(dateStr) {
+      const date = new Date(dateStr + "T00:00:00");
+      const start = new Date(date.getFullYear(), 0, 0);
+      const diff = date - start;
+      const dayOfYear = Math.floor(diff / 86400000);
+      const b = (360 / 365) * (dayOfYear - 81) * (Math.PI / 180);
+      return 9.87 * Math.sin(2 * b) - 7.53 * Math.cos(b) - 1.5 * Math.sin(b);
+    }
+
+    function calcSolarTime(dtStr, longitude) {
+      const [dateStr, timeStr] = dtStr.split("T");
+      const [hour, minute] = timeStr.split(":").map(Number);
+      const totalMinutes = hour * 60 + minute;
+      const lonCorrection = (longitude - 120) * 4;
+      const eot = equationOfTime(dateStr);
+      const corrected = totalMinutes + lonCorrection + eot;
+      const totalMod = ((corrected % 1440) + 1440) % 1440;
+      const solarHour = Math.floor(totalMod / 60);
+      const solarMinute = Math.round(totalMod % 60);
+      const base = new Date(dateStr + "T" + timeStr);
+      const solarDate = new Date(base.getTime() + (lonCorrection + eot) * 60000);
+      return {
+        solarHour,
+        solarMinute,
+        solarDateStr: `${solarDate.getFullYear()}-${pad(solarDate.getMonth() + 1)}-${pad(solarDate.getDate())}`,
+        lonCorrection: Math.round(lonCorrection * 10) / 10,
+        eot: Math.round(eot * 10) / 10,
+        totalDiff: Math.round((lonCorrection + eot) * 10) / 10
+      };
+    }
+
+    function getDaySB(dateStr) {
+      const base = new Date("2024-01-01T00:00:00");
+      const date = new Date(dateStr + "T00:00:00");
+      const diff = Math.round((date - base) / 86400000);
+      return STEMS[((diff % 10) + 10) % 10] + BRANCHES[((diff % 12) + 12) % 12];
+    }
+
+    function getHourSB(dayStem, hour) {
+      const branchIndex = hour === 23 ? 0 : Math.floor((hour + 1) / 2) % 12;
+      return STEMS[(HOUR_BASE[dayStem] + branchIndex) % 10] + BRANCHES[branchIndex];
+    }
+
+    function getBranchLabel(hour) {
+      const branchIndex = hour === 23 ? 0 : Math.floor((hour + 1) / 2) % 12;
+      return BRANCHES[branchIndex] + "时";
+    }
+
+    function calcLingGui(daySB, hourSB) {
+      const total = LG_DS[daySB[0]] + LG_DB[daySB[1]] + LG_HS[hourSB[0]] + LG_HB[hourSB[1]];
+      const isYang = STEMS.indexOf(daySB[0]) % 2 === 0;
+      const divisor = isYang ? 9 : 6;
+      let rem = total % divisor;
+      if (rem === 0) rem = divisor;
+      const main = LG_MAP[rem];
+      return { main, pair: PAIR[main] || "" };
+    }
+
+    function calcFeiTeng(hourSB) {
+      const main = FT_MAP[hourSB[0]];
+      return { main, pair: PAIR[main] || "" };
+    }
+
+    function calcNaZi(hourSB) {
+      const row = NAZI_TABLE[hourSB[1]];
+      return {
+        meridian: row[0],
+        ben: row[1],
+        benCode: row[2],
+        yuan: row[3],
+        yuanCode: row[4],
+        samePoint: row[1] === row[3]
+      };
+    }
+
+    function calcNaJia(daySB, hourSB) {
+      const dayTable = NAJIA_TABLE[daySB[0]];
+      if (!dayTable) return { points: null };
+      return { points: dayTable[hourSB] || null };
+    }
+
+    function chip(label, name, meta) {
+      return `<div class="chip"><div class="chip-label">${label}</div><div class="chip-name">${name}</div><div class="chip-meta">${meta}</div></div>`;
+    }
+
+    function renderPair(target, pairResult) {
+      const mainMeta = POINT_META[pairResult.main];
+      const pairMeta = POINT_META[pairResult.pair];
+      const main = chip("开穴", pairResult.main, `${mainMeta.m} · 通${mainMeta.e}`);
+      const pair = pairResult.pair ? `<div class="plus">+</div>${chip("配穴", pairResult.pair, `${pairMeta.m} · 通${pairMeta.e}`)}` : "";
+      target.innerHTML = main + pair;
+    }
+
+    function renderNaZi(target, data) {
+      const first = chip("本穴", data.ben, `${data.meridian} · ${data.benCode}`);
+      const second = data.samePoint ? "" : `<div class="plus">+</div>${chip("原穴", data.yuan, `${data.meridian} · ${data.yuanCode}`)}`;
+      target.innerHTML = first + second;
+    }
+
+    function renderNaJia(target, data) {
+      if (!data.points) {
+        target.innerHTML = '<div class="empty">此时辰闭穴（无）</div>';
+        return;
+      }
+      target.innerHTML = data.points.map((point) => chip(point.type, point.name, `${point.m} · ${point.code}`)).join("");
+    }
+
+    function setNow() {
+      dtInput.value = toLocalDT(new Date());
+    }
+
+    function updateSolarVisibility() {
+      solarBox.classList.toggle("active", useSolarInput.checked);
+    }
+
+    function calculate() {
+      if (!dtInput.value) setNow();
+      let calcDt = dtInput.value;
+      let solarInfo = null;
+      if (useSolarInput.checked) {
+        solarInfo = calcSolarTime(dtInput.value, Number(longitudeInput.value) || 116.4);
+        calcDt = `${solarInfo.solarDateStr}T${pad(solarInfo.solarHour)}:${pad(solarInfo.solarMinute)}`;
+      }
+
+      const [dateStr, timeStr] = calcDt.split("T");
+      const hour = Number(timeStr.split(":")[0]);
+      const daySB = getDaySB(dateStr);
+      const hourSB = getHourSB(daySB[0], hour);
+      const branchLabel = getBranchLabel(hour);
+      const lingGui = calcLingGui(daySB, hourSB);
+      const feiTeng = calcFeiTeng(hourSB);
+      const naZi = calcNaZi(hourSB);
+      const naJia = calcNaJia(daySB, hourSB);
+
+      document.getElementById("day-sb").textContent = daySB;
+      document.getElementById("hour-sb").textContent = hourSB;
+      document.getElementById("branch-label").textContent = branchLabel;
+      document.getElementById("nazi-badge").textContent = `${naZi.meridian}当令`;
+      document.getElementById("najia-badge").textContent = naJia.points ? naJia.points[0].m : "";
+
+      renderPair(document.getElementById("linggui"), lingGui);
+      renderPair(document.getElementById("feiteng"), feiTeng);
+      renderNaZi(document.getElementById("nazi"), naZi);
+      renderNaJia(document.getElementById("najia"), naJia);
+
+      banner.classList.add("active");
+      results.classList.add("active");
+
+      if (solarInfo) {
+        solarMeta.innerHTML = [
+          `经度修正 ${solarInfo.lonCorrection > 0 ? "+" : ""}${solarInfo.lonCorrection} 分`,
+          `均时差 ${solarInfo.eot > 0 ? "+" : ""}${solarInfo.eot} 分`,
+          `合计 ${solarInfo.totalDiff > 0 ? "+" : ""}${solarInfo.totalDiff} 分`
+        ].map((item) => `<span>${item}</span>`).join('<span>·</span>');
+        solarTime.textContent = `真太阳时：${pad(solarInfo.solarHour)}:${pad(solarInfo.solarMinute)}`;
+        solarResult.classList.add("active");
+      } else {
+        solarResult.classList.remove("active");
+      }
+    }
+
+    async function locate() {
+      if (!navigator.geolocation) {
+        locationHint.textContent = "当前浏览器不支持地理定位，请手动输入经度。";
+        return;
+      }
+      locateButton.disabled = true;
+      locateButton.textContent = "定位中";
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const lon = Math.round(pos.coords.longitude * 100) / 100;
+          longitudeInput.value = String(lon);
+          locationHint.textContent = `已定位到东经 ${lon}°。`;
+          locateButton.disabled = false;
+          locateButton.textContent = "自动定位";
+        },
+        () => {
+          locationHint.textContent = "定位失败，请检查浏览器权限或手动输入经度。";
+          locateButton.disabled = false;
+          locateButton.textContent = "自动定位";
+        },
+        { enableHighAccuracy: false, timeout: 10000 }
+      );
+    }
+
+    useSolarInput.addEventListener("change", updateSolarVisibility);
+    nowButton.addEventListener("click", () => {
+      setNow();
+      calculate();
+    });
+    calcButton.addEventListener("click", calculate);
+    locateButton.addEventListener("click", locate);
+
+    setNow();
+    updateSolarVisibility();
+    calculate();
+  </script>
+</body>
+</html>
