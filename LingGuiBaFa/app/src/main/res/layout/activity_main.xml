@@ -2,37 +2,27 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="12dp">
+    android:padding="14dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
-
-        <DatePicker
-            android:id="@+id/datePicker"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal" />
-
-        <TimePicker
-            android:id="@+id/timePicker"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal" />
+        android:orientation="vertical"
+        android:layout_marginBottom="24dp">
 
         <CheckBox
             android:id="@+id/cbSolar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="启用真太阳时修正" />
+            android:text="真太阳时修正"
+            android:textColor="@color/text_primary" />
 
         <LinearLayout
             android:id="@+id/solarPanel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
+            android:layout_marginBottom="8dp"
             android:gravity="center_vertical"
             android:orientation="horizontal"
             android:visibility="gone">
@@ -40,99 +30,93 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="经度 °E " />
+                android:text="经度 °E "
+                android:textColor="@color/text_secondary" />
 
             <EditText
                 android:id="@+id/etLongitude"
                 android:layout_width="80dp"
                 android:layout_height="wrap_content"
                 android:inputType="numberDecimal"
-                android:text="116.4" />
+                android:text="116.4"
+                android:textColor="@color/text_primary" />
         </LinearLayout>
 
-        <LinearLayout
+        <Button
+            android:id="@+id/btnCalc"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:gravity="center"
-            android:orientation="horizontal">
+            android:layout_height="48dp"
+            android:layout_marginBottom="12dp"
+            android:text="推算开穴"
+            android:textSize="16sp" />
 
-            <Button
-                android:id="@+id/btnNow"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="当前时间" />
-
-            <Button
-                android:id="@+id/btnCalc"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="推算开穴" />
-        </LinearLayout>
-
+        <!-- 真太阳时提示 -->
         <TextView
             android:id="@+id/tvSolar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:background="#EEF6F3"
+            android:layout_marginBottom="8dp"
+            android:background="@color/bg_solar"
             android:padding="10dp"
-            android:textSize="14sp"
-            android:visibility="gone" />
+            android:visibility="gone"
+            android:textColor="@color/c_feiteng"
+            android:textSize="13sp" />
 
         <!-- 干支 -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
+            android:layout_marginBottom="8dp"
             android:gravity="center"
             android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="日"
+                android:textColor="@color/text_secondary"
+                android:textSize="12sp" />
 
             <TextView
                 android:id="@+id/tvDaySB"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="22sp"
+                android:paddingHorizontal="6dp"
+                android:textColor="@color/text_primary"
+                android:textSize="24sp"
                 android:textStyle="bold" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingHorizontal="8dp"
-                android:text="·"
-                android:textSize="18sp" />
+                android:text="时"
+                android:textColor="@color/text_secondary"
+                android:textSize="12sp" />
 
             <TextView
                 android:id="@+id/tvHourSB"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="22sp"
+                android:paddingHorizontal="6dp"
+                android:textColor="@color/text_primary"
+                android:textSize="24sp"
                 android:textStyle="bold" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingHorizontal="8dp"
-                android:text="·"
-                android:textSize="18sp" />
 
             <TextView
                 android:id="@+id/tvBranch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="22sp"
-                android:textStyle="bold" />
+                android:textColor="@color/text_secondary"
+                android:textSize="14sp" />
         </LinearLayout>
 
         <!-- 灵龟八法 -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="灵龟八法（奇经纳卦）"
-            android:textColor="#7c5c2e"
+            android:layout_marginTop="8dp"
+            android:text="灵龟八法"
+            android:textColor="@color/c_linggui"
             android:textSize="14sp"
             android:textStyle="bold" />
 
@@ -140,18 +124,19 @@
             android:id="@+id/tvLingGui"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:background="#F6F0E4"
+            android:layout_marginTop="2dp"
+            android:background="@color/bg_result"
             android:padding="10dp"
-            android:textSize="16sp" />
+            android:textColor="@color/text_primary"
+            android:textSize="15sp" />
 
         <!-- 飞腾八法 -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="10dp"
             android:text="飞腾八法"
-            android:textColor="#3d6b5e"
+            android:textColor="@color/c_feiteng"
             android:textSize="14sp"
             android:textStyle="bold" />
 
@@ -159,18 +144,19 @@
             android:id="@+id/tvFeiTeng"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:background="#F6F0E4"
+            android:layout_marginTop="2dp"
+            android:background="@color/bg_result"
             android:padding="10dp"
-            android:textSize="16sp" />
+            android:textColor="@color/text_primary"
+            android:textSize="15sp" />
 
         <!-- 子午流注纳子法 -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="10dp"
             android:text="子午流注纳子法"
-            android:textColor="#4a5e8a"
+            android:textColor="@color/c_nazi"
             android:textSize="14sp"
             android:textStyle="bold" />
 
@@ -178,18 +164,19 @@
             android:id="@+id/tvNaZi"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:background="#F6F0E4"
+            android:layout_marginTop="2dp"
+            android:background="@color/bg_result"
             android:padding="10dp"
-            android:textSize="16sp" />
+            android:textColor="@color/text_primary"
+            android:textSize="15sp" />
 
         <!-- 子午流注纳甲法 -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="10dp"
             android:text="子午流注纳甲法"
-            android:textColor="#7a3d4a"
+            android:textColor="@color/c_najia"
             android:textSize="14sp"
             android:textStyle="bold" />
 
@@ -197,10 +184,11 @@
             android:id="@+id/tvNaJia"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:background="#F6F0E4"
+            android:layout_marginTop="2dp"
+            android:background="@color/bg_result"
             android:padding="10dp"
-            android:textSize="16sp" />
+            android:textColor="@color/text_primary"
+            android:textSize="15sp" />
 
     </LinearLayout>
 </ScrollView>

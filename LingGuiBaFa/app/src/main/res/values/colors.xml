@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="purple_200">#FFBB86FC</color>
-    <color name="purple_500">#FF6200EE</color>
-    <color name="purple_700">#FF3700B3</color>
-    <color name="teal_200">#FF03DAC5</color>
-    <color name="teal_700">#FF018786</color>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <color name="bg_page">#EFE7D8</color>
+    <color name="bg_card">#FFFCF6</color>
+    <color name="bg_result">#F6F0E4</color>
+    <color name="bg_solar">#EEF6F3</color>
+    <color name="text_primary">#23190F</color>
+    <color name="text_secondary">#8C7660</color>
+    <color name="c_linggui">#7C5C2E</color>
+    <color name="c_feiteng">#3D6B5E</color>
+    <color name="c_nazi">#4A5E8A</color>
+    <color name="c_najia">#7A3D4A</color>
 </resources>

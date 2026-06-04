@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="bg_page">#1A1613</color>
+    <color name="bg_card">#24201A</color>
+    <color name="bg_result">#2A2520</color>
+    <color name="bg_solar">#1A2F2A</color>
+    <color name="text_primary">#E4D8C8</color>
+    <color name="text_secondary">#9A8A78</color>
+    <color name="c_linggui">#C9A84C</color>
+    <color name="c_feiteng">#5AAB94</color>
+    <color name="c_nazi">#6A80B8</color>
+    <color name="c_najia">#B85A6A</color>
+</resources>
